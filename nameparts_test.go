@@ -46,3 +46,17 @@ func TestLocateSalutation(t *testing.T) {
 		t.Errorf("Expected 0.  Actual %v", res)
 	}
 }
+
+func TestParse(t *testing.T) {
+	res := Parse("Mr. James Polera")
+
+	if res.Salutation != "Mr." {
+		t.Errorf("Expected 'Mr.'.  Actual %v", res.Salutation)
+
+	}
+
+	if res.FirstName != "James" {
+		t.Errorf("Expected 'James'.  Actual %v", res.FirstName)
+	}
+
+}
