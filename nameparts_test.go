@@ -5,7 +5,7 @@ import (
 )
 
 func TestLooksCorporate(t *testing.T) {
-	n := nameString{FullName: "Sprockets Corp"}
+	n := nameString{FullName: "Sprockets Inc"}
 
 	res := n.looksCorporate()
 
@@ -16,7 +16,7 @@ func TestLooksCorporate(t *testing.T) {
 }
 
 func TestSearchParts(t *testing.T) {
-	n := nameString{FullName: "Mr James Polera"}
+	n := nameString{FullName: "Mr. James Polera"}
 
 	res := n.searchParts(&salutations)
 
@@ -24,4 +24,25 @@ func TestSearchParts(t *testing.T) {
 		t.Errorf("Expected true.  Actual %v", res)
 	}
 
+}
+
+func TestClean(t *testing.T) {
+	n := nameString{FullName: "Mr. James Polera"}
+
+	res := n.cleaned()
+
+	if res[0] != "Mr" {
+		t.Errorf("Expected 'Mr'.  Actual %v", res[0])
+	}
+
+}
+
+func TestLocateSalutation(t *testing.T) {
+	n := nameString{FullName: "Mr. James Polera"}
+
+	res := n.find("salutation")
+
+	if res != 0 {
+		t.Errorf("Expected 0.  Actual %v", res)
+	}
 }
