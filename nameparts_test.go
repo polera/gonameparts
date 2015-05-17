@@ -5,6 +5,7 @@ import (
 )
 
 func TestLooksCorporate(t *testing.T) {
+	t.Parallel()
 	n := nameString{FullName: "Sprockets Inc"}
 
 	res := n.looksCorporate()
@@ -16,6 +17,7 @@ func TestLooksCorporate(t *testing.T) {
 }
 
 func TestSearchParts(t *testing.T) {
+	t.Parallel()
 	n := nameString{FullName: "Mr. James Polera"}
 
 	res := n.searchParts(&salutations)
@@ -27,6 +29,7 @@ func TestSearchParts(t *testing.T) {
 }
 
 func TestClean(t *testing.T) {
+	t.Parallel()
 	n := nameString{FullName: "Mr. James Polera"}
 
 	res := n.cleaned()
@@ -38,6 +41,7 @@ func TestClean(t *testing.T) {
 }
 
 func TestLocateSalutation(t *testing.T) {
+	t.Parallel()
 	n := nameString{FullName: "Mr. James Polera"}
 
 	res := n.find("salutation")
@@ -48,6 +52,7 @@ func TestLocateSalutation(t *testing.T) {
 }
 
 func TestParse(t *testing.T) {
+	t.Parallel()
 	res := Parse("Mr. James Polera")
 
 	if res.Salutation != "Mr." {
