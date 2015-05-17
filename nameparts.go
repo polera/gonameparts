@@ -26,7 +26,7 @@ func (n *nameString) cleaned() []string {
 		for _, y := range unwanted {
 			x = strings.Replace(x, y, "", -1)
 		}
-		cleaned = append(cleaned, strings.Trim(x))
+		cleaned = append(cleaned, strings.Trim(x, " "))
 	}
 	return cleaned
 }
@@ -74,8 +74,8 @@ func Parse(name string) NameParts {
 	n := nameString{FullName: name}
 	p := NameParts{ProvidedName: name}
 
-	partMap = make(map[string]int)
-	parts = []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
+	partMap := make(map[string]int)
+	parts := []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
 
 	for _, part := range parts {
 		partMap[part] = n.find(part)
