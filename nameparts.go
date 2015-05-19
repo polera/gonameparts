@@ -86,7 +86,7 @@ func (n *nameString) split() []string {
 
 func (n *nameString) normalize() []string {
 	if n.hasComma() {
-		commaSplit := strings.SplitAfterN(n.FullName, ",", 2)
+		commaSplit := strings.SplitN(n.FullName, ",", 2)
 		sort.StringSlice(commaSplit).Swap(1, 0)
 		n.FullName = strings.Join(commaSplit, " ")
 	}
@@ -114,18 +114,82 @@ func (p *NameParts) slot(part string, value string) {
 
 }
 
+func min(indexA int, indexB int) int {
+	if indexA < indexB {
+		return indexA
+	}
+	return indexB
+}
+
+func (n *nameString) findNotSlotted(partMap map[string]int) []int {
+
+	var mappedValues []int
+	var notSlotted []int
+
+	for _, val := range partMap {
+		if val > -1 {
+			mappedValues = append(mappedValues, val)
+		}
+	}
+
+	for i, _ := range n.SplitName {
+		found := false
+		for _, j := range mappedValues {
+			if i == j {
+				found = true
+				break
+			}
+		}
+		if !found {
+			notSlotted = append(notSlotted, i)
+		}
+	}
+
+	return notSlotted
+
+}
+
 func Parse(name string) NameParts {
 	n := nameString{FullName: name}
 	p := NameParts{ProvidedName: name}
 
 	parts := []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
+	partMap := make(map[string]int)
 
+	// Slot Salutation, Generation and Suffix
 	for _, part := range parts {
 		partIndex := n.find(part)
+		partMap[part] = partIndex
 		if partIndex > -1 {
 			p.slot(part, n.SplitName[partIndex])
 		}
+	}
 
+	// Slot FirstName
+	partMap["first"] = partMap["salutation"] + 1
+	p.slot("first", n.SplitName[partMap["first"]])
+
+	// Slot prefixed LastName
+	if partMap["lnprefix"] > -1 {
+		lnEnd := len(n.SplitName) - 1
+		if partMap["generation"] > -1 {
+			lnEnd = min(lnEnd, partMap["generation"])
+		}
+		if partMap["suffix"] > -1 {
+			lnEnd = min(lnEnd, partMap["suffix"])
+		}
+
+		p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
+	}
+
+	// Slot the rest
+	notSlotted := n.findNotSlotted(partMap)
+
+	if len(notSlotted) == 2 {
+		p.slot("middle", n.SplitName[notSlotted[0]])
+		p.slot("last", n.SplitName[notSlotted[1]])
+	} else {
+		p.slot("last", n.SplitName[notSlotted[0]])
 	}
 
 	return p
