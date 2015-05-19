@@ -6,20 +6,21 @@ import (
 )
 
 type NameParts struct {
-	ProvidedName string   `json:"provided_name"`
-	FullName     string   `json:"full_name"`
-	Salutation   string   `json:"salutation"`
-	FirstName    string   `json:"first_name"`
-	MiddleName   string   `json:"middle_name"`
-	LastName     string   `json:"last_name"`
-	Generation   string   `json:"generation"`
-	Suffix       string   `json:"suffix"`
-	Aliases      []string `json:"aliases"`
+	ProvidedName string      `json:"provided_name"`
+	FullName     string      `json:"full_name"`
+	Salutation   string      `json:"salutation"`
+	FirstName    string      `json:"first_name"`
+	MiddleName   string      `json:"middle_name"`
+	LastName     string      `json:"last_name"`
+	Generation   string      `json:"generation"`
+	Suffix       string      `json:"suffix"`
+	Aliases      []NameParts `json:"aliases"`
 }
 
 type nameString struct {
 	FullName  string
 	SplitName []string
+	Aliases   []string
 }
 
 func (n *nameString) cleaned() []string {
@@ -59,6 +60,15 @@ func (n *nameString) hasComma() bool {
 	return false
 }
 
+func (n *nameString) hasAliases() (bool, string) {
+	for _, x := range nonName {
+		if strings.Contains(strings.ToUpper(n.FullName), x) {
+			return true, x
+		}
+	}
+	return false, ""
+}
+
 func (n *nameString) find(part string) int {
 	switch part {
 	case "salutation":
@@ -90,8 +100,30 @@ func (n *nameString) normalize() []string {
 		sort.StringSlice(commaSplit).Swap(1, 0)
 		n.FullName = strings.Join(commaSplit, " ")
 	}
+
+	hasAlias, aliasSep := n.hasAliases()
+
+	if hasAlias {
+		n.splitAliases(aliasSep)
+	}
+
 	return n.cleaned()
 
+}
+
+func (n *nameString) splitAliases(aliasSep string) {
+	splitNames := n.split()
+
+	for index, part := range splitNames {
+		if strings.ToUpper(part) == aliasSep {
+			splitNames[index] = "*|*"
+		}
+	}
+
+	names := strings.Split(strings.Join(splitNames, " "), "*|*")
+
+	n.FullName = names[0]
+	n.Aliases = names[1:]
 }
 
 func (p *NameParts) slot(part string, value string) {
@@ -144,6 +176,7 @@ func (n *nameString) findNotSlotted(slotted []int) []int {
 
 func Parse(name string) NameParts {
 	n := nameString{FullName: name}
+	n.normalize()
 	p := NameParts{ProvidedName: name}
 
 	parts := []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
@@ -192,6 +225,11 @@ func Parse(name string) NameParts {
 
 	if len(notSlotted) == 1 {
 		p.slot("last", n.SplitName[notSlotted[0]])
+	}
+
+	// Process aliases
+	for _, alias := range n.Aliases {
+		p.Aliases = append(p.Aliases, Parse(alias))
 	}
 
 	return p

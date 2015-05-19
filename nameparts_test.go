@@ -133,3 +133,14 @@ func TestLastNamePrefix(t *testing.T) {
 	}
 
 }
+
+func TestAliases(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("James Polera a/k/a Batman")
+
+	if res.Aliases[0].FirstName != "Batman" {
+		t.Errorf("Expected 'Batman'.  Actual: %v", res.Aliases[0].FirstName)
+	}
+
+}
