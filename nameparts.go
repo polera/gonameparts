@@ -121,20 +121,13 @@ func min(indexA int, indexB int) int {
 	return indexB
 }
 
-func (n *nameString) findNotSlotted(partMap map[string]int) []int {
+func (n *nameString) findNotSlotted(slotted []int) []int {
 
-	var mappedValues []int
 	var notSlotted []int
-
-	for _, val := range partMap {
-		if val > -1 {
-			mappedValues = append(mappedValues, val)
-		}
-	}
 
 	for i, _ := range n.SplitName {
 		found := false
-		for _, j := range mappedValues {
+		for _, j := range slotted {
 			if i == j {
 				found = true
 				break
@@ -155,6 +148,7 @@ func Parse(name string) NameParts {
 
 	parts := []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
 	partMap := make(map[string]int)
+	var slotted []int
 
 	// Slot Salutation, Generation and Suffix
 	for _, part := range parts {
@@ -162,33 +156,41 @@ func Parse(name string) NameParts {
 		partMap[part] = partIndex
 		if partIndex > -1 {
 			p.slot(part, n.SplitName[partIndex])
+			slotted = append(slotted, partIndex)
 		}
 	}
 
 	// Slot FirstName
 	partMap["first"] = partMap["salutation"] + 1
 	p.slot("first", n.SplitName[partMap["first"]])
+	slotted = append(slotted, partMap["salutation"]+1)
 
 	// Slot prefixed LastName
 	if partMap["lnprefix"] > -1 {
-		lnEnd := len(n.SplitName) - 1
+		lnEnd := len(n.SplitName)
 		if partMap["generation"] > -1 {
 			lnEnd = min(lnEnd, partMap["generation"])
 		}
 		if partMap["suffix"] > -1 {
 			lnEnd = min(lnEnd, partMap["suffix"])
 		}
-
 		p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
+
+		// Keep track of what we've slotted
+		for i := partMap["lnprefix"]; i <= lnEnd; i++ {
+			slotted = append(slotted, i)
+		}
 	}
 
 	// Slot the rest
-	notSlotted := n.findNotSlotted(partMap)
+	notSlotted := n.findNotSlotted(slotted)
 
 	if len(notSlotted) == 2 {
 		p.slot("middle", n.SplitName[notSlotted[0]])
 		p.slot("last", n.SplitName[notSlotted[1]])
-	} else {
+	}
+
+	if len(notSlotted) == 1 {
 		p.slot("last", n.SplitName[notSlotted[0]])
 	}
 

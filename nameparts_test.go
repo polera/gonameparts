@@ -77,7 +77,7 @@ func TestNormalize(t *testing.T) {
 
 }
 
-func TestParse(t *testing.T) {
+func TestParseAllFields(t *testing.T) {
 	t.Parallel()
 	res := Parse("Mr. James J. Polera Jr. Esq.")
 
@@ -104,4 +104,32 @@ func TestParse(t *testing.T) {
 	if res.Suffix != "Esq." {
 		t.Errorf("Expected 'Esq.'.  Actual %v", res.Suffix)
 	}
+}
+
+func TestParseFirstLast(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("James Polera")
+	if res.FirstName != "James" {
+		t.Errorf("Expected 'James'.  Actual %v", res.FirstName)
+	}
+
+	if res.LastName != "Polera" {
+		t.Errorf("Expected 'Polera'.  Actual %v", res.LastName)
+	}
+}
+
+func TestLastNamePrefix(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Otto von Bismark")
+
+	if res.FirstName != "Otto" {
+		t.Errorf("Expected 'Otto'.  Actual %v", res.FirstName)
+	}
+
+	if res.LastName != "von Bismark" {
+		t.Errorf("Expected 'von Bismark'.  Actual %v", res.LastName)
+	}
+
 }
