@@ -144,3 +144,13 @@ func TestAliases(t *testing.T) {
 	}
 
 }
+
+func TestNickname(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Philip Francis 'The Scooter' Rizzuto")
+
+	if res.Nickname != "'The Scooter'" {
+		t.Errorf("Expected 'The Scooter'.  Actual: %v", res.Nickname)
+	}
+}

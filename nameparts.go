@@ -14,12 +14,14 @@ type NameParts struct {
 	LastName     string      `json:"last_name"`
 	Generation   string      `json:"generation"`
 	Suffix       string      `json:"suffix"`
+	Nickname     string      `json:"nickname"`
 	Aliases      []NameParts `json:"aliases"`
 }
 
 type nameString struct {
 	FullName  string
 	SplitName []string
+	Nickname  string
 	Aliases   []string
 }
 
@@ -60,6 +62,32 @@ func (n *nameString) hasComma() bool {
 	return false
 }
 
+func (n *nameString) slotNickname() {
+
+	var nickNameBoundaries []int
+
+	for index, x := range n.split() {
+		if string(x[0]) == "'" || string(x[0]) == "\"" {
+			nickNameBoundaries = append(nickNameBoundaries, index)
+		}
+		if string(x[len(x)-1]) == "'" || string(x[len(x)-1]) == "\"" {
+			nickNameBoundaries = append(nickNameBoundaries, index)
+		}
+	}
+
+	if len(nickNameBoundaries) > 0 && len(nickNameBoundaries)%2 == 0 {
+		nickStart := nickNameBoundaries[0]
+		nickEnd := nickNameBoundaries[1]
+
+		nick := n.SplitName[:nickStart]
+		postNick := n.SplitName[nickEnd+1:]
+
+		n.Nickname = strings.Join(n.SplitName[nickStart:nickEnd+1], " ")
+		nick = append(nick, postNick...)
+		n.FullName = strings.Join(nick, " ")
+	}
+}
+
 func (n *nameString) hasAliases() (bool, string) {
 	for _, x := range nonName {
 		if strings.Contains(strings.ToUpper(n.FullName), x) {
@@ -95,16 +123,18 @@ func (n *nameString) split() []string {
 }
 
 func (n *nameString) normalize() []string {
-	if n.hasComma() {
-		commaSplit := strings.SplitN(n.FullName, ",", 2)
-		sort.StringSlice(commaSplit).Swap(1, 0)
-		n.FullName = strings.Join(commaSplit, " ")
-	}
-
 	hasAlias, aliasSep := n.hasAliases()
 
 	if hasAlias {
 		n.splitAliases(aliasSep)
+	}
+
+	n.slotNickname()
+
+	if n.hasComma() {
+		commaSplit := strings.SplitN(n.FullName, ",", 2)
+		sort.StringSlice(commaSplit).Swap(1, 0)
+		n.FullName = strings.Join(commaSplit, " ")
 	}
 
 	return n.cleaned()
@@ -177,7 +207,7 @@ func (n *nameString) findNotSlotted(slotted []int) []int {
 func Parse(name string) NameParts {
 	n := nameString{FullName: name}
 	n.normalize()
-	p := NameParts{ProvidedName: name}
+	p := NameParts{ProvidedName: name, Nickname: n.Nickname}
 
 	parts := []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
 	partMap := make(map[string]int)
