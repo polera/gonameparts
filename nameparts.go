@@ -1,9 +1,17 @@
+/*
+Package gonameparts splits a human name into individual parts.  This is useful
+when dealing with external data sources that provide names as a single value, but
+you need to store the discrete parts in a database for example.
+*/
 package gonameparts
 
 import (
 	"strings"
 )
 
+/*
+NameParts represents the slotted components of a given name
+*/
 type NameParts struct {
 	ProvidedName string      `json:"provided_name"`
 	FullName     string      `json:"full_name"`
@@ -37,6 +45,9 @@ func (p *NameParts) slot(part string, value string) {
 
 }
 
+/*
+Parse takes a string name as a parameter and returns a populated NameParts object
+*/
 func Parse(name string) NameParts {
 	n := nameString{FullName: name}
 	n.normalize()

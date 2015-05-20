@@ -157,7 +157,7 @@ func (n *nameString) findNotSlotted(slotted []int) []int {
 
 	var notSlotted []int
 
-	for i, _ := range n.SplitName {
+	for i := range n.SplitName {
 		found := false
 		for _, j := range slotted {
 			if i == j {

@@ -1,6 +1,7 @@
 package gonameparts
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -175,4 +176,17 @@ func TestStripSupplemental(t *testing.T) {
 	if res.LastName != "Rizzuto" {
 		t.Errorf("Expected 'Rizzuto'.  Actual: %v", res.LastName)
 	}
+}
+
+func ExampleParse() {
+	res := Parse("Thurston Howell III")
+	fmt.Println("FirstName:", res.FirstName)
+	fmt.Println("LastName:", res.LastName)
+	fmt.Println("Generation:", res.Generation)
+
+	// Output:
+	// FirstName: Thurston
+	// LastName: Howell
+	// Generation: III
+
 }
