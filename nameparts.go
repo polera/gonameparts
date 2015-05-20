@@ -6,6 +6,7 @@ you need to store the discrete parts in a database for example.
 package gonameparts
 
 import (
+	"sort"
 	"strings"
 )
 
@@ -98,13 +99,35 @@ func Parse(name string) NameParts {
 	// Slot the rest
 	notSlotted := n.findNotSlotted(slotted)
 
-	if len(notSlotted) == 2 {
-		p.slot("middle", n.SplitName[notSlotted[0]])
-		p.slot("last", n.SplitName[notSlotted[1]])
+	if len(notSlotted) > 1 {
+		lnPrefix := partMap["lnprefix"]
+		var multiMiddle []string
+		if lnPrefix > -1 {
+			for p := range notSlotted {
+				multiMiddle = append(multiMiddle, n.SplitName[p])
+			}
+			p.slot("middle", strings.Join(multiMiddle, " "))
+
+		} else {
+			sort.Sort(sort.IntSlice(notSlotted))
+			maxNotSlottedIndex := notSlotted[len(notSlotted)-1]
+			p.slot("last", n.SplitName[maxNotSlottedIndex])
+
+			for _, p := range notSlotted {
+				if p != maxNotSlottedIndex {
+					multiMiddle = append(multiMiddle, n.SplitName[p])
+				}
+			}
+			p.slot("middle", strings.Join(multiMiddle, " "))
+		}
 	}
 
 	if len(notSlotted) == 1 {
-		p.slot("last", n.SplitName[notSlotted[0]])
+		if partMap["lnprefix"] > -1 {
+			p.slot("middle", n.SplitName[notSlotted[0]])
+		} else {
+			p.slot("last", n.SplitName[notSlotted[0]])
+		}
 	}
 
 	// Process aliases

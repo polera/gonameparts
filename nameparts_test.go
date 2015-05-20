@@ -190,3 +190,19 @@ func ExampleParse() {
 	// Generation: III
 
 }
+
+func ExampleParseMultipleMiddleNames() {
+
+	res := Parse("President George Herbert Walker Bush")
+	fmt.Println("Salutation:", res.Salutation)
+	fmt.Println("FirstName:", res.FirstName)
+	fmt.Println("MiddleName:", res.MiddleName)
+	fmt.Println("LastName:", res.LastName)
+
+	// Output:
+	// Salutation: President
+	// FirstName: George
+	// MiddleName: Herbert Walker
+	// LastName: Bush
+
+}
