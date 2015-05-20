@@ -154,3 +154,25 @@ func TestNickname(t *testing.T) {
 		t.Errorf("Expected 'The Scooter'.  Actual: %v", res.Nickname)
 	}
 }
+
+func TestStripSupplemental(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Philip Francis 'The Scooter' Rizzuto, deceased")
+
+	if res.FirstName != "Philip" {
+		t.Errorf("Expected 'Philip'.  Actual: %v", res.FirstName)
+	}
+
+	if res.MiddleName != "Francis" {
+		t.Errorf("Expected 'Francis'.  Actual: %v", res.MiddleName)
+	}
+
+	if res.Nickname != "'The Scooter'" {
+		t.Errorf("Expected 'The Scooter'.  Actual: %v", res.Nickname)
+	}
+
+	if res.LastName != "Rizzuto" {
+		t.Errorf("Expected 'Rizzuto'.  Actual: %v", res.LastName)
+	}
+}
