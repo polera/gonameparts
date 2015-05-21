@@ -36,7 +36,7 @@ func main() {
 	// LastName: Howell
 	// Generation: III
 
-  // Parse a name with multiple "also known as" aliases, output JSON
+        // Parse a name with multiple "also known as" aliases, output JSON
 	multipleAKA := gonameparts.Parse("Tony Stark a/k/a Ironman a/k/a Stark, Anthony a/k/a Anthony Edward \"Tony\" Stark")
 	jsonParts, _ := json.Marshal(multipleAKA)
 	fmt.Printf("%v\n", string(jsonParts))
