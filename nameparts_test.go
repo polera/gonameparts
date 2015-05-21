@@ -178,6 +178,36 @@ func TestStripSupplemental(t *testing.T) {
 	}
 }
 
+func TestLongPrefixedLastName(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Saleh ibn Tariq ibn Khalid al-Fulan")
+
+	if res.FirstName != "Saleh" {
+		t.Errorf("Expected 'Saleh'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "ibn Tariq ibn Khalid al-Fulan" {
+		t.Errorf("Expected 'ibn Tariq ibn Khalid al-Fulan'.  Actual: %v", res.LastName)
+
+	}
+}
+
+func TestMisplacedApostrophe(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("John O' Hurley")
+
+	if res.FirstName != "John" {
+		t.Errorf("Expected 'John'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "O'Hurley" {
+		t.Errorf("Expected 'O'Hurley'.  Actual: %v", res.LastName)
+	}
+
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)

@@ -75,6 +75,38 @@ func (n *nameString) slotNickname() {
 	}
 }
 
+func (n *nameString) fixMisplacedApostrophe() {
+
+	var endsWithApostrophe []int
+	var counter int
+
+	for index, x := range n.split() {
+		if string(x[len(x)-1]) == "'" {
+			endsWithApostrophe = append(endsWithApostrophe, index)
+		}
+		counter++
+	}
+
+	if len(endsWithApostrophe) > 0 && endsWithApostrophe[0] != counter {
+		misplacedStart := endsWithApostrophe[0]
+
+		// Build a new name part composed of the misplaced apostrophe
+		// plus what it should be attached to (i.e. O' Hurley becomes O'Hurley)
+		fixedName := []string{n.SplitName[misplacedStart]}
+		fixedName = append(fixedName, n.SplitName[misplacedStart+1])
+		fixedPlacement := strings.Join(fixedName, "")
+
+		// Rebuild our FullName with our fixedPlacement
+		tmpName := n.SplitName[:misplacedStart]
+		tmpName = append(tmpName, fixedPlacement)
+		partsAfterMisplacedStart := n.SplitName[misplacedStart+2:]
+		tmpName = append(tmpName, partsAfterMisplacedStart...)
+		n.FullName = strings.Join(tmpName, " ")
+
+	}
+
+}
+
 func (n *nameString) hasAliases() (bool, string) {
 	for _, x := range nonName {
 		if strings.Contains(strings.ToUpper(n.FullName), x) {
@@ -126,6 +158,9 @@ func (n *nameString) normalize() []string {
 
 	// Handle quoted Nicknames
 	n.slotNickname()
+
+	// Handle misplaced apostrophes
+	n.fixMisplacedApostrophe()
 
 	// Swap Lastname, Firstname to Firstname Lastname
 	if n.hasComma() {
