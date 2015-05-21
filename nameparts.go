@@ -46,6 +46,37 @@ func (p *NameParts) slot(part string, value string) {
 
 }
 
+func (p *NameParts) buildFullName() {
+	var fullNameParts []string
+
+	if len(p.Salutation) > 0 {
+		fullNameParts = append(fullNameParts, p.Salutation)
+	}
+
+	if len(p.FirstName) > 0 {
+		fullNameParts = append(fullNameParts, p.FirstName)
+	}
+
+	if len(p.MiddleName) > 0 {
+		fullNameParts = append(fullNameParts, p.MiddleName)
+	}
+
+	if len(p.LastName) > 0 {
+		fullNameParts = append(fullNameParts, p.LastName)
+	}
+
+	if len(p.Generation) > 0 {
+		fullNameParts = append(fullNameParts, p.Generation)
+	}
+
+	if len(p.Suffix) > 0 {
+		fullNameParts = append(fullNameParts, p.Suffix)
+	}
+
+	p.FullName = strings.Join(fullNameParts, " ")
+
+}
+
 /*
 Parse takes a string name as a parameter and returns a populated NameParts object
 */
@@ -134,6 +165,9 @@ func Parse(name string) NameParts {
 	for _, alias := range n.Aliases {
 		p.Aliases = append(p.Aliases, Parse(alias))
 	}
+
+	// Prepare FullName
+	p.buildFullName()
 
 	return p
 }

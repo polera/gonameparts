@@ -227,6 +227,16 @@ func TestMultipleAKA(t *testing.T) {
 
 }
 
+func TestBuildFullName(t *testing.T) {
+	res := Parse("President George Herbert Walker Bush")
+
+	if res.FullName != "President George Herbert Walker Bush" {
+
+		t.Errorf("Expected 'President George Herbert Walker Bush'.  Actual: %v", res.FullName)
+	}
+
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)
