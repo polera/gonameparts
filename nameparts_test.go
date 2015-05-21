@@ -240,7 +240,7 @@ func ExampleParse() {
 
 }
 
-func ExampleParseMultipleMiddleNames() {
+func ExampleParse_second() {
 
 	res := Parse("President George Herbert Walker Bush")
 	fmt.Println("Salutation:", res.Salutation)
