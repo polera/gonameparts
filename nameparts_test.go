@@ -237,6 +237,13 @@ func TestBuildFullName(t *testing.T) {
 
 }
 
+func TestDottedAka(t *testing.T) {
+	res := Parse("James Polera a.k.a James K. Polera")
+	if len(res.Aliases) != 1 {
+		t.Errorf("Expected 1 alias.  Actual: %v", len(res.Aliases))
+	}
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)
