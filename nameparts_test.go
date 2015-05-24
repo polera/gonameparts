@@ -244,6 +244,15 @@ func TestDottedAka(t *testing.T) {
 	}
 }
 
+func TestUnicodeCharsInName(t *testing.T) {
+	res := Parse("König Ludwig")
+
+	if res.FirstName != "König" {
+		t.Errorf("Expected 'König'.  Actual: %v", res.FirstName)
+
+	}
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)
