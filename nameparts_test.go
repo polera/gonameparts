@@ -249,7 +249,26 @@ func TestUnicodeCharsInName(t *testing.T) {
 
 	if res.FirstName != "König" {
 		t.Errorf("Expected 'König'.  Actual: %v", res.FirstName)
+	}
+}
 
+func TestTabsInName(t *testing.T) {
+	res := Parse("Dr. James\tPolera\tEsq.")
+
+	if res.Salutation != "Dr." {
+		t.Errorf("Expected 'Dr.'.  Actual: %v", res.Salutation)
+	}
+
+	if res.FirstName != "James" {
+		t.Errorf("Expected 'James'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "Polera" {
+		t.Errorf("Expected 'Polera'.  Actual: %v", res.LastName)
+	}
+
+	if res.Suffix != "Esq." {
+		t.Errorf("Expected 'Esq.'.  Actual: %v", res.Suffix)
 	}
 }
 
