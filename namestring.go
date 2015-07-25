@@ -40,7 +40,6 @@ func (n *nameString) looksCorporate() bool {
 }
 
 func (n *nameString) hasComma() bool {
-
 	for _, x := range n.split() {
 		if strings.ContainsAny(x, ",") {
 			return true
@@ -50,14 +49,13 @@ func (n *nameString) hasComma() bool {
 }
 
 func (n *nameString) slotNickname() {
-
 	var nickNameBoundaries []int
 
 	for index, x := range n.split() {
-		if string(x[0]) == "'" || string(x[0]) == "\"" {
+		if string(x[0]) == "'" || x[0] == '"' {
 			nickNameBoundaries = append(nickNameBoundaries, index)
 		}
-		if string(x[len(x)-1]) == "'" || string(x[len(x)-1]) == "\"" {
+		if string(x[len(x)-1]) == "'" || x[len(x)-1] == '"' {
 			nickNameBoundaries = append(nickNameBoundaries, index)
 		}
 	}
@@ -76,7 +74,6 @@ func (n *nameString) slotNickname() {
 }
 
 func (n *nameString) fixMisplacedApostrophe() {
-
 	var endsWithApostrophe []int
 	var counter int
 
@@ -104,7 +101,6 @@ func (n *nameString) fixMisplacedApostrophe() {
 		n.FullName = strings.Join(tmpName, " ")
 
 	}
-
 }
 
 func (n *nameString) hasAliases() (bool, string) {
@@ -142,7 +138,6 @@ func (n *nameString) split() []string {
 }
 
 func (n *nameString) normalize() []string {
-
 	// Handle any aliases in our nameString
 	hasAlias, aliasSep := n.hasAliases()
 
@@ -170,7 +165,6 @@ func (n *nameString) normalize() []string {
 	}
 
 	return n.cleaned()
-
 }
 
 func (n *nameString) splitAliases(aliasSep string) {
@@ -183,13 +177,11 @@ func (n *nameString) splitAliases(aliasSep string) {
 	}
 
 	names := strings.Split(strings.Join(splitNames, " "), "*|*")
-
 	n.FullName = names[0]
 	n.Aliases = names[1:]
 }
 
 func (n *nameString) findNotSlotted(slotted []int) []int {
-
 	var notSlotted []int
 
 	for i := range n.SplitName {
@@ -204,6 +196,5 @@ func (n *nameString) findNotSlotted(slotted []int) []int {
 			notSlotted = append(notSlotted, i)
 		}
 	}
-
 	return notSlotted
 }
