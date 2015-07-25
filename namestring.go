@@ -24,9 +24,9 @@ func (n *nameString) cleaned() []string {
 	return cleaned
 }
 
-func (n *nameString) searchParts(parts *[]string) int {
+func (n *nameString) searchParts(parts []string) int {
 	for i, x := range n.cleaned() {
-		for _, y := range *parts {
+		for _, y := range parts {
 			if strings.ToUpper(x) == strings.ToUpper(y) {
 				return i
 			}
@@ -36,7 +36,7 @@ func (n *nameString) searchParts(parts *[]string) int {
 }
 
 func (n *nameString) looksCorporate() bool {
-	return n.searchParts(&corpEntity) > -1
+	return n.searchParts(corpEntity) > -1
 }
 
 func (n *nameString) hasComma() bool {
@@ -119,17 +119,17 @@ func (n *nameString) hasAliases() (bool, string) {
 func (n *nameString) find(part string) int {
 	switch part {
 	case "salutation":
-		return n.searchParts(&salutations)
+		return n.searchParts(salutations)
 	case "generation":
-		return n.searchParts(&generations)
+		return n.searchParts(generations)
 	case "suffix":
-		return n.searchParts(&suffixes)
+		return n.searchParts(suffixes)
 	case "lnprefix":
-		return n.searchParts(&lnPrefixes)
+		return n.searchParts(lnPrefixes)
 	case "nonname":
-		return n.searchParts(&nonName)
+		return n.searchParts(nonName)
 	case "supplemental":
-		return n.searchParts(&supplementalInfo)
+		return n.searchParts(supplementalInfo)
 	default:
 
 	}

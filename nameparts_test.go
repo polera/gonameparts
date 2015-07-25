@@ -21,7 +21,7 @@ func TestSearchParts(t *testing.T) {
 	t.Parallel()
 	n := nameString{FullName: "Mr. James Polera"}
 
-	res := n.searchParts(&salutations)
+	res := n.searchParts(salutations)
 
 	if res != 0 {
 		t.Errorf("Expected true.  Actual %v", res)
