@@ -132,7 +132,14 @@ func Parse(name string) NameParts {
 		if partMap["suffix"] > -1 && partMap["generation"] < lnEnd {
 			lnEnd = partMap["suffix"]
 		}
-		p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
+		// Need to validate the slice parameters make sense
+		// Example Name: "I am the Popsicle"
+		// This example causes a hit on the generation at position 0,
+		// which in turn causes lnEnd to be set to 0, but the lnprefix
+		// is greater than 0, causing a slice out of bounds panic
+		if lnEnd > partMap["lnprefix"] {
+			p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
+		}
 
 		// Keep track of what we've slotted
 		for i := partMap["lnprefix"]; i <= lnEnd; i++ {
