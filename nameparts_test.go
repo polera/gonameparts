@@ -272,6 +272,17 @@ func TestTabsInName(t *testing.T) {
 	}
 }
 
+func TestObviouslyBadName(t *testing.T) {
+	// make sure we don't panic on a clearly bad name
+	defer func() {
+		if r := recover(); r != nil {
+			// panic happened, fail the test
+			t.Errorf("Panic happened, where it shouldn't have")
+		}
+	}()
+	Parse("I am a Popsicle")
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)
