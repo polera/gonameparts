@@ -306,6 +306,29 @@ func TestLastNameSalutation(t *testing.T) {
 	}
 }
 
+func TestLastNameNonName(t *testing.T) {
+	// make sure we don't panic if the last name looks like a nonname
+	defer func() {
+		if r := recover(); r != nil {
+			// panic happened, fail the test
+			t.Errorf("Panic happened, where it shouldn't have")
+		}
+	}()
+	res := Parse("Jessica Aka")
+
+	if res.FirstName != "Jessica" {
+		t.Errorf("Expected 'Jessica'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "Aka" {
+		t.Errorf("Expected 'Aka'.  Actual: %v", res.LastName)
+	}
+
+	if res.FullName != "Jessica Aka" {
+		t.Errorf("Expected 'Jessica Aka'.  Actual: %v", res.FullName)
+	}
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)

@@ -104,7 +104,7 @@ func Parse(name string) NameParts {
 		return p
 	}
 
-	parts := []string{"generation", "suffix", "lnprefix", "nonname", "supplemental"}
+	parts := []string{"generation", "suffix", "lnprefix", "supplemental"}
 	partMap := make(map[string]int)
 	var slotted []int
 
@@ -125,6 +125,15 @@ func Parse(name string) NameParts {
 		slotted = append(slotted, salIndex)
 	} else {
 		partMap["salutation"] = -1
+	}
+
+	// Find nonname, but make sure it's not last; otherwise it may be a false positive
+	if nnIndex := n.find("nonname"); nnIndex > -1 && nnIndex < len(n.SplitName)-1 {
+		partMap["nonname"] = nnIndex
+		p.slot("nonname", n.SplitName[nnIndex])
+		slotted = append(slotted, nnIndex)
+	} else {
+		partMap["nonname"] = -1
 	}
 
 	// Slot FirstName
