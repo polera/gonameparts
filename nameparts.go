@@ -14,7 +14,7 @@ import (
 Identifiable name parts
 */
 var (
-	salutations      = []string{"MR", "MS", "MRS", "DR", "MISS", "DOCTOR", "CORP", "SGT", "PVT", "JUDGE", "CAPT", "COL", "MAJ", "LT", "LIEUTENANT", "PRM", "PATROLMAN", "HON", "OFFICER", "REV", "PRES", "PRESIDENT", "GOV", "GOVERNOR", "VICE PRESIDENT", "VP", "MAYOR", "SIR", "MADAM", "HONERABLE"}
+	salutations      = []string{"MR", "MS", "MRS", "DR", "MISS", "DOCTOR", "CORP", "SGT", "PVT", "JUDGE", "CAPT", "COL", "MAJ", "LT", "LIEUTENANT", "PRM", "PATROLMAN", "HON", "OFFICER", "REV", "PRES", "PRESIDENT", "GOV", "GOVERNOR", "VICE PRESIDENT", "VP", "MAYOR", "SIR", "MADAM", "HONORABLE"}
 	generations      = []string{"JR", "SR", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "1ST", "2ND", "3RD", "4TH", "5TH", "6TH", "7TH", "8TH", "9TH", "10TH", "FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH", "SIXTH", "SEVENTH", "EIGHTH", "NINTH", "TENTH"}
 	suffixes         = []string{"ESQ", "PHD", "MD"}
 	lnPrefixes       = []string{"DE", "DA", "DI", "LA", "DU", "DEL", "DEI", "VDA", "DELLO", "DELLA", "DEGLI", "DELLE", "VAN", "VON", "DER", "DEN", "HEER", "TEN", "TER", "VANDE", "VANDEN", "VANDER", "VOOR", "VER", "AAN", "MC", "BEN", "SAN", "SAINZ", "BIN", "LI", "LE", "DES", "AM", "AUS'M", "VOM", "ZUM", "ZUR", "TEN", "IBN"}
