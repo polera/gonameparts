@@ -14,7 +14,7 @@ import (
 Identifiable name parts
 */
 var (
-	salutations      = []string{"MR", "MS", "MRS", "DR", "MISS", "DOCTOR", "CORP", "SGT", "PVT", "JUDGE", "CAPT", "COL", "MAJ", "LT", "LIEUTENANT", "PRM", "PATROLMAN", "HON", "OFFICER", "REV", "PRES", "PRESIDENT", "GOV", "GOVERNOR", "VICE PRESIDENT", "VP", "MAYOR", "SIR", "MADAM", "HONERABLE"}
+	salutations      = []string{"MR", "MS", "MRS", "DR", "MISS", "DOCTOR", "CORP", "SGT", "PVT", "JUDGE", "CAPT", "COL", "MAJ", "LT", "LIEUTENANT", "PRM", "PATROLMAN", "HON", "OFFICER", "REV", "PRES", "PRESIDENT", "GOV", "GOVERNOR", "VICE PRESIDENT", "VP", "MAYOR", "SIR", "MADAM", "HONORABLE"}
 	generations      = []string{"JR", "SR", "I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "1ST", "2ND", "3RD", "4TH", "5TH", "6TH", "7TH", "8TH", "9TH", "10TH", "FIRST", "SECOND", "THIRD", "FOURTH", "FIFTH", "SIXTH", "SEVENTH", "EIGHTH", "NINTH", "TENTH"}
 	suffixes         = []string{"ESQ", "PHD", "MD"}
 	lnPrefixes       = []string{"DE", "DA", "DI", "LA", "DU", "DEL", "DEI", "VDA", "DELLO", "DELLA", "DEGLI", "DELLE", "VAN", "VON", "DER", "DEN", "HEER", "TEN", "TER", "VANDE", "VANDEN", "VANDER", "VOOR", "VER", "AAN", "MC", "BEN", "SAN", "SAINZ", "BIN", "LI", "LE", "DES", "AM", "AUS'M", "VOM", "ZUM", "ZUR", "TEN", "IBN"}
@@ -104,7 +104,7 @@ func Parse(name string) NameParts {
 		return p
 	}
 
-	parts := []string{"salutation", "generation", "suffix", "lnprefix", "nonname", "supplemental"}
+	parts := []string{"generation", "suffix", "lnprefix", "supplemental"}
 	partMap := make(map[string]int)
 	var slotted []int
 
@@ -116,6 +116,24 @@ func Parse(name string) NameParts {
 			p.slot(part, n.SplitName[partIndex])
 			slotted = append(slotted, partIndex)
 		}
+	}
+
+	// Find salutation, but make sure it's first; otherwise it may be a false positive
+	if salIndex := n.find("salutation"); salIndex == 0 {
+		partMap["salutation"] = salIndex
+		p.slot("salutation", n.SplitName[salIndex])
+		slotted = append(slotted, salIndex)
+	} else {
+		partMap["salutation"] = -1
+	}
+
+	// Find nonname, but make sure it's not last; otherwise it may be a false positive
+	if nnIndex := n.find("nonname"); nnIndex > -1 && nnIndex < len(n.SplitName)-1 {
+		partMap["nonname"] = nnIndex
+		p.slot("nonname", n.SplitName[nnIndex])
+		slotted = append(slotted, nnIndex)
+	} else {
+		partMap["nonname"] = -1
 	}
 
 	// Slot FirstName

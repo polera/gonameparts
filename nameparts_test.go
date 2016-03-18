@@ -283,6 +283,52 @@ func TestObviouslyBadName(t *testing.T) {
 	Parse("I am a Popsicle")
 }
 
+func TestLastNameSalutation(t *testing.T) {
+	// make sure we don't panic if the last name looks like a salutation
+	defer func() {
+		if r := recover(); r != nil {
+			// panic happened, fail the test
+			t.Errorf("Panic happened, where it shouldn't have")
+		}
+	}()
+	res := Parse("Alan Hon")
+
+	if res.FirstName != "Alan" {
+		t.Errorf("Expected 'Alan'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "Hon" {
+		t.Errorf("Expected 'Hon'.  Actual: %v", res.LastName)
+	}
+
+	if res.FullName != "Alan Hon" {
+		t.Errorf("Expected 'Alan Hon'.  Actual: %v", res.FullName)
+	}
+}
+
+func TestLastNameNonName(t *testing.T) {
+	// make sure we don't panic if the last name looks like a nonname
+	defer func() {
+		if r := recover(); r != nil {
+			// panic happened, fail the test
+			t.Errorf("Panic happened, where it shouldn't have")
+		}
+	}()
+	res := Parse("Jessica Aka")
+
+	if res.FirstName != "Jessica" {
+		t.Errorf("Expected 'Jessica'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "Aka" {
+		t.Errorf("Expected 'Aka'.  Actual: %v", res.LastName)
+	}
+
+	if res.FullName != "Jessica Aka" {
+		t.Errorf("Expected 'Jessica Aka'.  Actual: %v", res.FullName)
+	}
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)

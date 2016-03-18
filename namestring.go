@@ -104,8 +104,9 @@ func (n *nameString) fixMisplacedApostrophe() {
 }
 
 func (n *nameString) hasAliases() (bool, string) {
+	upperName := strings.ToUpper(n.FullName)
 	for _, x := range nonName {
-		if strings.Contains(strings.ToUpper(n.FullName), x) {
+		if strings.Contains(upperName, x) && !strings.HasSuffix(upperName, x) {
 			return true, x
 		}
 	}
