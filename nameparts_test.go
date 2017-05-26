@@ -329,6 +329,24 @@ func TestLastNameNonName(t *testing.T) {
 	}
 }
 
+func TestNameEndsWithApostrophe(t *testing.T) {
+	// make sure we don't panic on a clearly bad name
+	defer func() {
+		if r := recover(); r != nil {
+			// panic happened, fail the test
+			t.Errorf("Panic happened, where it shouldn't have")
+		}
+	}()
+	res := Parse("James Polera'")
+	if res.FirstName != "James" {
+		t.Errorf("Expected 'James'. Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "Polera" {
+		t.Errorf("Expected 'Polera'. Actual: %v", res.LastName)
+	}
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)

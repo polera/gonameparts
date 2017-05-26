@@ -75,31 +75,35 @@ func (n *nameString) slotNickname() {
 
 func (n *nameString) fixMisplacedApostrophe() {
 	var endsWithApostrophe []int
-	var counter int
 
 	for index, x := range n.split() {
 		if string(x[len(x)-1]) == "'" {
 			endsWithApostrophe = append(endsWithApostrophe, index)
 		}
-		counter++
 	}
 
-	if len(endsWithApostrophe) > 0 && endsWithApostrophe[0] != counter {
-		misplacedStart := endsWithApostrophe[0]
+	if len(endsWithApostrophe) > 0 {
+		for _, y := range endsWithApostrophe {
+			if n.SplitName[y] == n.SplitName[len(n.SplitName)-1] {
+				tmpName := n.SplitName[:y]
+				tmpName = append(tmpName, strings.Trim(n.SplitName[y], "'"))
+				n.FullName = strings.Join(tmpName, " ")
+			} else {
+				misplacedStart := y
+				// Build a new name part composed of the misplaced apostrophe
+				// plus what it should be attached to (i.e. O' Hurley becomes O'Hurley)
+				fixedName := []string{n.SplitName[misplacedStart]}
+				fixedName = append(fixedName, n.SplitName[misplacedStart+1])
+				fixedPlacement := strings.Join(fixedName, "")
 
-		// Build a new name part composed of the misplaced apostrophe
-		// plus what it should be attached to (i.e. O' Hurley becomes O'Hurley)
-		fixedName := []string{n.SplitName[misplacedStart]}
-		fixedName = append(fixedName, n.SplitName[misplacedStart+1])
-		fixedPlacement := strings.Join(fixedName, "")
-
-		// Rebuild our FullName with our fixedPlacement
-		tmpName := n.SplitName[:misplacedStart]
-		tmpName = append(tmpName, fixedPlacement)
-		partsAfterMisplacedStart := n.SplitName[misplacedStart+2:]
-		tmpName = append(tmpName, partsAfterMisplacedStart...)
-		n.FullName = strings.Join(tmpName, " ")
-
+				// Rebuild our FullName with our fixedPlacement
+				tmpName := n.SplitName[:misplacedStart]
+				tmpName = append(tmpName, fixedPlacement)
+				partsAfterMisplacedStart := n.SplitName[misplacedStart+2:]
+				tmpName = append(tmpName, partsAfterMisplacedStart...)
+				n.FullName = strings.Join(tmpName, " ")
+			}
+		}
 	}
 }
 
@@ -134,6 +138,7 @@ func (n *nameString) find(part string) int {
 }
 
 func (n *nameString) split() []string {
+
 	n.SplitName = strings.Fields(n.FullName)
 	return n.SplitName
 }
