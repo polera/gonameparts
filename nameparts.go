@@ -137,9 +137,13 @@ func Parse(name string) NameParts {
 	}
 
 	// Slot FirstName
-	partMap["first"] = partMap["salutation"] + 1
-	p.slot("first", n.SplitName[partMap["first"]])
-	slotted = append(slotted, partMap["salutation"]+1)
+	if partMap["salutation"] > -1 && partMap["salutation"] < len(n.SplitName) - 1 {
+		partMap["first"] = partMap["salutation"] + 1
+		p.slot("first", n.SplitName[partMap["first"]])
+		slotted = append(slotted, partMap["salutation"]+1)
+	} else {
+		partMap["first"] = -1
+	}
 
 	// Slot prefixed LastName
 	if partMap["lnprefix"] > -1 {
