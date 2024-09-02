@@ -107,6 +107,19 @@ func TestParseAllFields(t *testing.T) {
 	}
 }
 
+func TestParseOnlySalutation(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Mr.")
+	if res.FirstName != "" {
+		t.Errorf("Expected ''.  Actual %v", res.FirstName)
+	}
+
+	if res.LastName != "" {
+		t.Errorf("Expected ''.  Actual %v", res.LastName)
+	}
+}
+
 func TestParseFirstLast(t *testing.T) {
 	t.Parallel()
 
