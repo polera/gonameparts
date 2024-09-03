@@ -360,6 +360,19 @@ func TestNameEndsWithApostrophe(t *testing.T) {
 	}
 }
 
+func TestSuffix(t *testing.T) {
+	t.Parallel()
+	res := Parse("John A. Smith, Jr.")
+
+	if res.FirstName != "John" {
+		t.Errorf("Expected 'John'. Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "Smith" {
+		t.Errorf("Expected 'Smith'. Actual: %v", res.LastName)
+	}
+}
+
 func ExampleParse() {
 	res := Parse("Thurston Howell III")
 	fmt.Println("FirstName:", res.FirstName)
