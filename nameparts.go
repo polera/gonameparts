@@ -127,28 +127,7 @@ func Parse(name string) NameParts {
 	FindFirst(&p, &n, partMap, &slotted)
 
 	// Slot prefixed LastName
-	if partMap["lnprefix"] > -1 {
-		lnEnd := len(n.SplitName)
-		if partMap["generation"] > -1 {
-			lnEnd = partMap["generation"]
-		}
-		if partMap["suffix"] > -1 && partMap["generation"] < lnEnd {
-			lnEnd = partMap["suffix"]
-		}
-		// Need to validate the slice parameters make sense
-		// Example Name: "I am the Popsicle"
-		// This example causes a hit on the generation at position 0,
-		// which in turn causes lnEnd to be set to 0, but the lnprefix
-		// is greater than 0, causing a slice out of bounds panic
-		if lnEnd > partMap["lnprefix"] {
-			p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
-		}
-
-		// Keep track of what we've slotted
-		for i := partMap["lnprefix"]; i <= lnEnd; i++ {
-			slotted = append(slotted, i)
-		}
-	}
+	FindLast(&p, &n, partMap, &slotted)
 
 	// Slot the rest
 	notSlotted := n.findNotSlotted(slotted)
@@ -229,4 +208,29 @@ func FindNoName(p *NameParts, n *nameString, partMap map[string]int, slotted *[]
 func FindFirst(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
 	p.slot("first", n.SplitName[partMap["first"]])
 	*slotted = append(*slotted, partMap["first"])
+}
+
+func FindLast(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
+	if partMap["lnprefix"] > -1 {
+		lnEnd := len(n.SplitName)
+		if partMap["generation"] > -1 {
+			lnEnd = partMap["generation"]
+		}
+		if partMap["suffix"] > -1 && partMap["generation"] < lnEnd {
+			lnEnd = partMap["suffix"]
+		}
+		// Need to validate the slice parameters make sense
+		// Example Name: "I am the Popsicle"
+		// This example causes a hit on the generation at position 0,
+		// which in turn causes lnEnd to be set to 0, but the lnprefix
+		// is greater than 0, causing a slice out of bounds panic
+		if lnEnd > partMap["lnprefix"] {
+			p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
+		}
+
+		// Keep track of what we've slotted
+		for i := partMap["lnprefix"]; i <= lnEnd; i++ {
+			*slotted = append(*slotted, i)
+		}
+	}
 }
