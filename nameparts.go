@@ -115,13 +115,7 @@ func Parse(name string) NameParts {
 	FindSalutation(&p, &n, partMap, &slotted)
 
 	// Find nonname, but make sure it's not last; otherwise it may be a false positive
-	if nnIndex := n.find("nonname"); nnIndex > -1 && nnIndex < len(n.SplitName)-1 {
-		partMap["nonname"] = nnIndex
-		p.slot("nonname", n.SplitName[nnIndex])
-		slotted = append(slotted, nnIndex)
-	} else {
-		partMap["nonname"] = -1
-	}
+	FindNoName(&p, &n, partMap, &slotted)
 
 	// Slot FirstName
 
@@ -221,5 +215,15 @@ func FindSalutation(p *NameParts, n *nameString, partMap map[string]int, slotted
 		*slotted = append(*slotted, salIndex)
 	} else {
 		partMap["salutation"] = -1
+	}
+}
+
+func FindNoName(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
+	if nnIndex := n.find("nonname"); nnIndex > -1 && nnIndex < len(n.SplitName)-1 {
+		partMap["nonname"] = nnIndex
+		p.slot("nonname", n.SplitName[nnIndex])
+		*slotted = append(*slotted, nnIndex)
+	} else {
+		partMap["nonname"] = -1
 	}
 }
