@@ -109,14 +109,7 @@ func Parse(name string) NameParts {
 	var slotted []int
 
 	// Slot and index parts
-	for _, part := range parts {
-		partIndex := n.find(part)
-		partMap[part] = partIndex
-		if partIndex > -1 {
-			p.slot(part, n.SplitName[partIndex])
-			slotted = append(slotted, partIndex)
-		}
-	}
+	SlotAndIndex(&p, &n, &parts, partMap, &slotted)
 
 	// Find salutation, but make sure it's first; otherwise it may be a false positive
 	if salIndex := n.find("salutation"); salIndex == 0 {
@@ -214,4 +207,15 @@ func Parse(name string) NameParts {
 	p.buildFullName()
 
 	return p
+}
+
+func SlotAndIndex(p *NameParts, n *nameString, parts *[]string, partMap map[string]int, slotted *[]int) {
+	for _, part := range *parts {
+		partIndex := n.find(part)
+		partMap[part] = partIndex
+		if partIndex > -1 {
+			p.slot(part, n.SplitName[partIndex])
+			*slotted = append(*slotted, partIndex)
+		}
+	}
 }
