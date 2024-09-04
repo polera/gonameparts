@@ -132,28 +132,8 @@ func Parse(name string) NameParts {
 	// Slot the rest
 	notSlotted := n.findNotSlotted(slotted)
 
-	if len(notSlotted) > 1 {
-		lnPrefix := partMap["lnprefix"]
-		var multiMiddle []string
-		if lnPrefix > -1 {
-			for p := range notSlotted {
-				multiMiddle = append(multiMiddle, n.SplitName[p])
-			}
-			p.slot("middle", strings.Join(multiMiddle, " "))
-
-		} else {
-			sort.Sort(sort.IntSlice(notSlotted))
-			maxNotSlottedIndex := notSlotted[len(notSlotted)-1]
-			p.slot("last", n.SplitName[maxNotSlottedIndex])
-
-			for _, p := range notSlotted {
-				if p != maxNotSlottedIndex {
-					multiMiddle = append(multiMiddle, n.SplitName[p])
-				}
-			}
-			p.slot("middle", strings.Join(multiMiddle, " "))
-		}
-	}
+	// Identify a middle name
+	FindMiddle(&p, &n, partMap, &notSlotted)
 
 	if len(notSlotted) == 1 {
 		if partMap["lnprefix"] > -1 {
@@ -231,6 +211,32 @@ func FindLast(p *NameParts, n *nameString, partMap map[string]int, slotted *[]in
 		// Keep track of what we've slotted
 		for i := partMap["lnprefix"]; i <= lnEnd; i++ {
 			*slotted = append(*slotted, i)
+		}
+	}
+}
+
+func FindMiddle(p *NameParts, n *nameString, partMap map[string]int, notSlotted *[]int) {
+	if len(*notSlotted) > 1 {
+		lnPrefix := partMap["lnprefix"]
+		var multiMiddle []string
+		if lnPrefix > -1 {
+			for p := range *notSlotted {
+				multiMiddle = append(multiMiddle, n.SplitName[p])
+			}
+			p.slot("middle", strings.Join(multiMiddle, " "))
+
+		} else {
+			sort.Sort(sort.IntSlice(*notSlotted))
+			idx := len(*notSlotted) - 1
+			maxNotSlottedIndex := (*notSlotted)[idx]
+			p.slot("last", n.SplitName[maxNotSlottedIndex])
+
+			for _, p := range *notSlotted {
+				if p != maxNotSlottedIndex {
+					multiMiddle = append(multiMiddle, n.SplitName[p])
+				}
+			}
+			p.slot("middle", strings.Join(multiMiddle, " "))
 		}
 	}
 }
