@@ -118,15 +118,13 @@ func Parse(name string) NameParts {
 	FindNoName(&p, &n, partMap, &slotted)
 
 	// Slot FirstName
-
 	firstPos := partMap["salutation"] + 1
 	if firstPos == len(n.SplitName) {
 		p.buildFullName()
 		return p
 	}
 	partMap["first"] = firstPos
-	p.slot("first", n.SplitName[partMap["first"]])
-	slotted = append(slotted, firstPos)
+	FindFirst(&p, &n, partMap, &slotted)
 
 	// Slot prefixed LastName
 	if partMap["lnprefix"] > -1 {
@@ -226,4 +224,9 @@ func FindNoName(p *NameParts, n *nameString, partMap map[string]int, slotted *[]
 	} else {
 		partMap["nonname"] = -1
 	}
+}
+
+func FindFirst(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
+	p.slot("first", n.SplitName[partMap["first"]])
+	*slotted = append(*slotted, partMap["first"])
 }
