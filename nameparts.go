@@ -112,13 +112,7 @@ func Parse(name string) NameParts {
 	SlotAndIndex(&p, &n, &parts, partMap, &slotted)
 
 	// Find salutation, but make sure it's first; otherwise it may be a false positive
-	if salIndex := n.find("salutation"); salIndex == 0 {
-		partMap["salutation"] = salIndex
-		p.slot("salutation", n.SplitName[salIndex])
-		slotted = append(slotted, salIndex)
-	} else {
-		partMap["salutation"] = -1
-	}
+	FindSalutation(&p, &n, partMap, &slotted)
 
 	// Find nonname, but make sure it's not last; otherwise it may be a false positive
 	if nnIndex := n.find("nonname"); nnIndex > -1 && nnIndex < len(n.SplitName)-1 {
@@ -217,5 +211,15 @@ func SlotAndIndex(p *NameParts, n *nameString, parts *[]string, partMap map[stri
 			p.slot(part, n.SplitName[partIndex])
 			*slotted = append(*slotted, partIndex)
 		}
+	}
+}
+
+func FindSalutation(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
+	if salIndex := n.find("salutation"); salIndex == 0 {
+		partMap["salutation"] = salIndex
+		p.slot("salutation", n.SplitName[salIndex])
+		*slotted = append(*slotted, salIndex)
+	} else {
+		partMap["salutation"] = -1
 	}
 }
