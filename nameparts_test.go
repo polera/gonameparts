@@ -497,3 +497,95 @@ func TestScanPeek(t *testing.T) {
 		t.Errorf("Expected 'D.' - Actual: %v", peekedToken)
 	}
 }
+
+func TestPunctuationStack(t *testing.T) {
+	t.Parallel()
+
+	stack := new(PuncStack).init()
+	stack.push(PERIOD)
+	stack.push("D")
+
+	c, present := stack.pop()
+	if c != PERIOD {
+		t.Errorf("Expected '.' - Actual: %v", c)
+	}
+
+	if present != true {
+		t.Errorf("Expected 'true' - Actual: %v", present)
+	}
+}
+
+func TestStackOrder(t *testing.T) {
+	t.Parallel()
+
+	stack := new(PuncStack).init()
+	stack.push(PERIOD)
+	stack.push(COMMA)
+	stack.push(SLASH)
+	s, _ := stack.pop()
+	c, _ := stack.pop()
+	p, _ := stack.pop()
+
+	if p != PERIOD {
+		t.Errorf("Expected '.' - Actual: %v", p)
+	}
+
+	if c != COMMA {
+		t.Errorf("Expected ',' - Actual: %v", c)
+	}
+
+	if s != SLASH {
+		t.Errorf("Expected '/' - Actual: %v", s)
+	}
+
+}
+
+func TestStackQuotationCount(t *testing.T) {
+	t.Parallel()
+
+	stack := new(PuncStack).init()
+	stack.push(PERIOD)
+	stack.push(QUO)
+	stack.push(COMMA)
+	stack.push(SLASH)
+	stack.push(QUO)
+
+	if stack.quomark != 2 {
+		t.Errorf("Expected 2 - Actual: %v", stack.quomark)
+	}
+}
+
+func TestLetterStack(t *testing.T) {
+	t.Parallel()
+
+	stack := new(LetterStack).init()
+	stack.push("D")
+	stack.push("r")
+	stack.push(PERIOD)
+
+	if stack.size() != 2 {
+		t.Errorf("Expected 2 - Actual: %v", stack.size())
+	}
+
+	if stack.allCaps() != false {
+		t.Errorf("Expected false - Actual: %v", stack.allCaps())
+	}
+}
+
+func TestLetterStackAllCaps(t *testing.T) {
+	t.Parallel()
+
+	stack := new(LetterStack).init()
+	stack.push("I")
+	stack.push("I")
+	stack.push("I")
+	stack.push(PERIOD)
+
+	if stack.size() != 3 {
+		t.Errorf("Expected 2 - Actual: %v", stack.size())
+	}
+
+	if stack.allCaps() != true {
+		t.Errorf("Expected true - Actual: %v", stack.allCaps())
+	}
+}
