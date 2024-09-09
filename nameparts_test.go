@@ -413,7 +413,7 @@ func TestScannerCreation(t *testing.T) {
 	}
 
 	if s.Size != 3 {
-		t.Errorf("Expected 4. Actual: %v", s.Size)
+		t.Errorf("Expected 3. Actual: %v", s.Size)
 	}
 
 	tokens := []string{"John", "D.", "Rockefeller,", "Jr."}
