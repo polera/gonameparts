@@ -423,6 +423,34 @@ func TestScannerCreation(t *testing.T) {
 
 }
 
+func TestScanCurrent(t *testing.T) {
+	t.Parallel()
+	name := "John D. Rockefeller, Jr."
+	s := new(Scanner).init(name)
+
+	token, _ := s.current()
+
+	if token != "John" {
+		t.Errorf("Expected 'John' - Actual: %v", token)
+	}
+}
+
+func TestScanCurrentEmpty(t *testing.T) {
+	t.Parallel()
+	name := ""
+	s := new(Scanner).init(name)
+
+	token, err := s.current()
+
+	if token != "" {
+		t.Errorf("Expected '' - Actual: %v", token)
+	}
+
+	if err == nil {
+		t.Errorf("Expected an error")
+	}
+}
+
 func TestScanNext(t *testing.T) {
 	t.Parallel()
 	name := "John D. Rockefeller, Jr."
