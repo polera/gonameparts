@@ -526,6 +526,35 @@ func TestScanPeek(t *testing.T) {
 	}
 }
 
+func TestScanLatterHalfNegative(t *testing.T) {
+	t.Parallel()
+	name := "John D. Rockefeller, Jr."
+	s := new(Scanner).init(name)
+
+	if s.latterHalf() == true {
+		t.Errorf("Expected false - Actual: %v", s.latterHalf())
+	}
+}
+
+func TestScanLatterHalfPositive(t *testing.T) {
+	t.Parallel()
+	name := "John D. Rockefeller, Jr."
+	s := new(Scanner).init(name)
+	s.Position = 2
+
+	if s.latterHalf() == false {
+		t.Errorf("Expected true - Actual: %v", s.latterHalf())
+	}
+
+	name2 := "Kiefer Williams Frederick Dempsey George Rufus Sutherland"
+	s2 := new(Scanner).init(name2)
+	s2.Position = 3
+
+	if s2.latterHalf() == false {
+		t.Errorf("Expected true - Actual: %v", s2.latterHalf())
+	}
+}
+
 func TestPunctuationStack(t *testing.T) {
 	t.Parallel()
 

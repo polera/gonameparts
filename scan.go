@@ -51,5 +51,5 @@ func (s *Scanner) peek() (string, error) {
 }
 
 func (s *Scanner) latterHalf() bool {
-	return s.Position > s.Size/2
+	return s.Position >= s.Size/2
 }
