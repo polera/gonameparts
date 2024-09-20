@@ -1,6 +1,7 @@
 package gonameparts
 
 import (
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -104,4 +105,20 @@ func (l *LetterStack) size() int {
 
 func (l *LetterStack) allCaps() bool {
 	return uint(l.size()) == l.capitals
+}
+
+func (l *LetterStack) assemble() string {
+	var token string
+	for i := l.size() - 1; i >= 0; i-- {
+		token += l.s[i]
+	}
+	return token
+}
+
+func feedStacks(token string, stack1 *PuncStack, stack2 *LetterStack) {
+	characters := strings.Split(token, "")
+	for _, ch := range characters {
+		stack1.push(ch)
+		stack2.push(ch)
+	}
 }

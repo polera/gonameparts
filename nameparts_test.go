@@ -646,3 +646,20 @@ func TestLetterStackAllCaps(t *testing.T) {
 		t.Errorf("Expected true - Actual: %v", stack.allCaps())
 	}
 }
+
+func TestLetterStackCleanToken(t *testing.T) {
+	t.Parallel()
+
+	stack := new(LetterStack).init()
+	stack.push("S")
+	stack.push("m")
+	stack.push("i")
+	stack.push(COMMA)
+	stack.push("t")
+	stack.push("h")
+	stack.push(PERIOD)
+
+	if stack.assemble() != "Smith" {
+		t.Errorf("Expected Smith - Actual: %v", stack.assemble())
+	}
+}
