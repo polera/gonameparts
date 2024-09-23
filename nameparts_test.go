@@ -170,6 +170,26 @@ func TestNickname(t *testing.T) {
 	}
 }
 
+func TestOneNickname1(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Charles 'Lucky' Luciano")
+
+	if res.Nickname != "Lucky" {
+		t.Errorf("Expected 'Lucky' --  Actual: %v", res.Nickname)
+	}
+}
+
+func TestOneNickname2(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Charles \"Lucky\" Luciano")
+
+	if res.Nickname != "Lucky" {
+		t.Errorf("Expected 'Lucky' --  Actual: %v", res.Nickname)
+	}
+}
+
 func TestStripSupplemental(t *testing.T) {
 	t.Parallel()
 
