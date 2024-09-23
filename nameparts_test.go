@@ -176,19 +176,19 @@ func TestStripSupplemental(t *testing.T) {
 	res := Parse("Philip Francis 'The Scooter' Rizzuto, deceased")
 
 	if res.FirstName != "Philip" {
-		t.Errorf("Expected 'Philip'.  Actual: %v", res.FirstName)
+		t.Errorf("Expected forename to be 'Philip'.  Actual: %v", res.FirstName)
 	}
 
 	if res.MiddleName != "Francis" {
-		t.Errorf("Expected 'Francis'.  Actual: %v", res.MiddleName)
+		t.Errorf("Expected middle name to be 'Francis'.  Actual: %v", res.MiddleName)
 	}
 
 	if res.Nickname != "'The Scooter'" {
-		t.Errorf("Expected 'The Scooter'.  Actual: %v", res.Nickname)
+		t.Errorf("Expected nickname to be 'The Scooter'.  Actual: %v", res.Nickname)
 	}
 
 	if res.LastName != "Rizzuto" {
-		t.Errorf("Expected 'Rizzuto'.  Actual: %v", res.LastName)
+		t.Errorf("Expected surname to be 'Rizzuto'.  Actual: %v", res.LastName)
 	}
 }
 
