@@ -207,6 +207,20 @@ func TestLongPrefixedLastName(t *testing.T) {
 	}
 }
 
+func TestIrishSurname(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("John O'Hurley")
+
+	if res.FirstName != "John" {
+		t.Errorf("Expected 'John'.  Actual: %v", res.FirstName)
+	}
+
+	if res.LastName != "O'Hurley" {
+		t.Errorf("Expected 'O'Hurley'.  Actual: %v", res.LastName)
+	}
+}
+
 func TestMisplacedApostrophe(t *testing.T) {
 	t.Parallel()
 
