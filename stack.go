@@ -7,10 +7,11 @@ import (
 )
 
 const (
-	COMMA  = ","
-	PERIOD = "."
-	SLASH  = "/"
-	QUO    = "\""
+	COMMA      = ","
+	PERIOD     = "."
+	SLASH      = "/"
+	APOSTROPHE = "'"
+	QUO        = "\""
 )
 
 type Stack[T any] []T
@@ -38,6 +39,7 @@ type PuncStack struct {
 	quomark uint
 	comma   uint
 	period  uint
+	apo     uint
 	slash   uint
 }
 
@@ -45,6 +47,7 @@ func (p *PuncStack) init() *PuncStack {
 	p.quomark = 0
 	p.comma = 0
 	p.period = 0
+	p.apo = 0
 	p.slash = 0
 	return p
 }
@@ -60,6 +63,9 @@ func (p *PuncStack) push(c string) {
 	case SLASH:
 		p.s.push(c)
 		p.slash += 1
+	case APOSTROPHE:
+		p.s.push(c)
+		p.apo += 1
 	case QUO:
 		p.s.push(c)
 		p.quomark += 1
