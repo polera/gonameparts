@@ -681,6 +681,21 @@ func TestLetterStackAllCaps(t *testing.T) {
 	}
 }
 
+func TestLetterStackAKA(t *testing.T) {
+	t.Parallel()
+
+	stack := new(LetterStack).init()
+	stack.push("a")
+	stack.push(PERIOD)
+	stack.push("k")
+	stack.push(PERIOD)
+	stack.push("a")
+
+	if stack.aka() == false {
+		t.Errorf("Expected true - Actual: %v", stack.aka())
+	}
+}
+
 func TestLetterStackCleanToken(t *testing.T) {
 	t.Parallel()
 

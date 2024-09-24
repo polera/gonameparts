@@ -121,6 +121,11 @@ func (l *LetterStack) assemble() string {
 	return token
 }
 
+func (l *LetterStack) aka() bool {
+	token := l.assemble()
+	return strings.ToUpper(token) == "AKA"
+}
+
 func feedStacks(token string, stack1 *PuncStack, stack2 *LetterStack) {
 	characters := strings.Split(token, "")
 	for _, ch := range characters {
