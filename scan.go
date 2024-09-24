@@ -53,3 +53,34 @@ func (s *Scanner) peek() (string, error) {
 func (s *Scanner) latterHalf() bool {
 	return s.Position >= s.Size/2
 }
+
+func (s *Scanner) cut() (string, string) {
+	size := s.Size
+	for range size {
+		// Read current word.
+		token, err := s.current()
+		if err != nil {
+			return "", ""
+		}
+
+		// Create two short-lived stacks for this token.
+		stackP := new(PuncStack).init()
+		stackL := new(LetterStack).init()
+
+		// Parse each character in word.
+		feedStacks(token, stackP, stackL)
+
+		if stackL.aka() {
+			// Cut string into two pieces around AKA
+			divider := s.Position
+			first := strings.Join(s.Tokens[:divider], " ")
+			second := strings.Join(s.Tokens[divider+1:], " ")
+			return first, second
+		}
+
+		s.next()
+	}
+
+	s.Position = 0
+	return EMPTY, EMPTY
+}
