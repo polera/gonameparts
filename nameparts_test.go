@@ -747,3 +747,14 @@ func TestLetterStackCutNothing(t *testing.T) {
 		t.Errorf("Expected scanner position to be reset: %v", s.Position)
 	}
 }
+
+func TestPeekPro(t *testing.T) {
+	t.Parallel()
+	name := "James K. Polera, Esq."
+	s := new(Scanner).init(name)
+	s.Position = 2
+
+	if s.isNextTokenPro() == false {
+		t.Errorf("Expected TRUE: %v", s.isNextTokenPro())
+	}
+}

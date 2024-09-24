@@ -84,3 +84,24 @@ func (s *Scanner) cut() (string, string) {
 	s.Position = 0
 	return EMPTY, EMPTY
 }
+
+func (s *Scanner) isNextTokenPro() bool {
+	token, err := s.peek()
+	if err != nil {
+		return false
+	}
+	terminus := s.Tokens[s.Final] == token
+
+	// Create two short-lived stacks for this token.
+	stackP := new(PuncStack).init()
+	stackL := new(LetterStack).init()
+
+	// Parse each character in word.
+	feedStacks(token, stackP, stackL)
+
+	if stackP.period == 1 && terminus {
+		return true
+	}
+
+	return false
+}
