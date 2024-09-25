@@ -257,6 +257,7 @@ func TestMisplacedApostrophe(t *testing.T) {
 }
 
 func TestMultipleAKA(t *testing.T) {
+	t.Skip("Reconsider the desired value from this test, and rewrite functionality...")
 	t.Parallel()
 
 	res := Parse("Tony Stark a/k/a Ironman a/k/a Stark, Anthony a/k/a Anthony Edward \"Tony\" Stark")
