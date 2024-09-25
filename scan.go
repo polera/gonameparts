@@ -60,7 +60,8 @@ func (s *Scanner) cut() (string, string) {
 		// Read current word.
 		token, err := s.current()
 		if err != nil {
-			return "", ""
+			s.Position = 0
+			return EMPTY, EMPTY
 		}
 
 		// Create two short-lived stacks for this token.
@@ -75,6 +76,12 @@ func (s *Scanner) cut() (string, string) {
 			divider := s.Position
 			first := strings.Join(s.Tokens[:divider], " ")
 			second := strings.Join(s.Tokens[divider+1:], " ")
+
+			if second == EMPTY {
+				s.Position = 0
+				return EMPTY, EMPTY
+			}
+
 			return first, second
 		}
 
