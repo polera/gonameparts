@@ -759,3 +759,21 @@ func TestPeekPro(t *testing.T) {
 		t.Errorf("Expected TRUE: %v", s.isNextTokenPro())
 	}
 }
+
+func TestPunctuationStackHyphen(t *testing.T) {
+	t.Parallel()
+
+	stack := new(PuncStack).init()
+	stack.push("a")
+	stack.push("l")
+	stack.push(HYPHEN)
+	stack.push("B")
+	stack.push("i")
+	stack.push("l")
+	stack.push("a")
+	stack.push("l")
+
+	if stack.hyphenated() == false {
+		t.Errorf("Expected 'true' - Actual: %v", stack.hyphenated())
+	}
+}

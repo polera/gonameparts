@@ -12,6 +12,7 @@ const (
 	SLASH      = "/"
 	APOSTROPHE = "'"
 	QUO        = "\""
+	HYPHEN     = "-"
 )
 
 type Stack[T any] []T
@@ -41,6 +42,7 @@ type PuncStack struct {
 	period  uint
 	apo     uint
 	slash   uint
+	hyphen  uint
 }
 
 func (p *PuncStack) init() *PuncStack {
@@ -49,6 +51,7 @@ func (p *PuncStack) init() *PuncStack {
 	p.period = 0
 	p.apo = 0
 	p.slash = 0
+	p.hyphen = 0
 	return p
 }
 
@@ -69,6 +72,9 @@ func (p *PuncStack) push(c string) {
 	case QUO:
 		p.s.push(c)
 		p.quomark += 1
+	case HYPHEN:
+		p.s.push(c)
+		p.hyphen += 1
 	default:
 		return
 	}
@@ -76,6 +82,10 @@ func (p *PuncStack) push(c string) {
 
 func (p *PuncStack) pop() (string, bool) {
 	return p.s.pop()
+}
+
+func (p *PuncStack) hyphenated() bool {
+	return p.hyphen == 1
 }
 
 type LetterStack struct {
