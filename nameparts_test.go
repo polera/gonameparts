@@ -778,3 +778,23 @@ func TestPunctuationStackHyphen(t *testing.T) {
 		t.Errorf("Expected 'true' - Actual: %v", stack.hyphenated())
 	}
 }
+
+func TestLongAKA(t *testing.T) {
+	t.Parallel()
+
+	res := Parse("Tony Stark a/k/a Ironman a/k/a Stark, Anthony a/k/a Anthony Edward \"Tony\" Stark")
+
+	if res.FirstName != "Anthony" {
+		t.Errorf("Expected forename: Anthony -  Actual: %v", res.FirstName)
+	}
+
+	if res.Nickname != "Tony" {
+		t.Errorf("Expected nickname: Tony - Actual: %v", res.Nickname)
+	}
+
+	if res.LastName != "Stark" {
+		fmt.Printf("WHAT THE FUCK %v\n", res.LastName)
+		t.Errorf("Expected surname: Stark - Actual: %v", res.LastName)
+	}
+
+}
