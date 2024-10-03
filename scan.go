@@ -112,3 +112,30 @@ func (s *Scanner) isNextTokenPro() bool {
 
 	return false
 }
+
+func (s *Scanner) isNextTokenSuffix() bool {
+	token, err := s.peek()
+	if err != nil {
+		return false
+	}
+
+	suffix := false
+	if s.Tokens[s.Final] == token {
+		suffix = true
+	} else if s.Tokens[s.Final-1] == token {
+		suffix = true
+	}
+
+	// Create two short-lived stacks for this token.
+	stackP := new(PuncStack).init()
+	stackL := new(LetterStack).init()
+
+	// Parse each character in word.
+	feedStacks(token, stackP, stackL)
+
+	if stackP.period == 1 && suffix {
+		return true
+	}
+
+	return false
+}

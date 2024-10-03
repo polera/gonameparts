@@ -592,6 +592,24 @@ func TestScanLatterHalfPositive(t *testing.T) {
 	}
 }
 
+func TestScanSuffix(t *testing.T) {
+	t.Parallel()
+	name := "John D. Rockefeller, Jr."
+	s := new(Scanner).init(name)
+	s.Position = 2
+
+	currentToken, _ := s.current()
+	answer := s.isNextTokenSuffix()
+
+	if currentToken != "Rockefeller," {
+		t.Errorf("Expected 'Rockefeller,' - Actual: %v", currentToken)
+	}
+
+	if answer == false {
+		t.Errorf("Expected 'true' - Actual: %v", answer)
+	}
+}
+
 func TestPunctuationStack(t *testing.T) {
 	t.Parallel()
 
