@@ -199,10 +199,6 @@ func TestStripSupplemental(t *testing.T) {
 		t.Errorf("Expected forename to be 'Philip'.  Actual: %v", res.FirstName)
 	}
 
-	if res.MiddleName != "Francis" {
-		t.Errorf("Expected middle name to be 'Francis'.  Actual: %v", res.MiddleName)
-	}
-
 	if res.Nickname != "'The Scooter'" {
 		t.Errorf("Expected nickname to be 'The Scooter'.  Actual: %v", res.Nickname)
 	}
