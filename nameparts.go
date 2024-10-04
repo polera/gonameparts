@@ -6,8 +6,12 @@ you need to store the discrete parts in a database for example.
 package gonameparts
 
 import (
-	"sort"
+	"slices"
 	"strings"
+)
+
+const (
+	EMPTY = ""
 )
 
 /*
@@ -37,6 +41,7 @@ type NameParts struct {
 	Suffix       string      `json:"suffix"`
 	Nickname     string      `json:"nickname"`
 	Aliases      []NameParts `json:"aliases"`
+	Size         int         `json:"size"`
 }
 
 func (p *NameParts) slot(part string, value string) {
@@ -86,6 +91,7 @@ func (p *NameParts) buildFullName() {
 		fullNameParts = append(fullNameParts, p.Suffix)
 	}
 
+	p.Size = len(p.FullName)
 	p.FullName = strings.Join(fullNameParts, " ")
 
 }
@@ -94,149 +100,232 @@ func (p *NameParts) buildFullName() {
 Parse takes a string name as a parameter and returns a populated NameParts object
 */
 func Parse(name string) NameParts {
-	n := nameString{FullName: name}
-	n.normalize()
+	s := new(Scanner).init(name)
 
-	p := NameParts{ProvidedName: name, Nickname: n.Nickname}
-
-	// If we're dealing with a business name, just return it back
-	if n.looksCorporate() {
-		return p
-	}
-
-	parts := []string{"generation", "suffix", "lnprefix", "supplemental"}
-	partMap := make(map[string]int)
-	var slotted []int
-
-	// Slot and index parts
-	SlotAndIndex(&p, &n, &parts, partMap, &slotted)
-
-	// Find salutation, but make sure it's first; otherwise it may be a false positive
-	FindSalutation(&p, &n, partMap, &slotted)
-
-	// Find nonname, but make sure it's not last; otherwise it may be a false positive
-	FindNoName(&p, &n, partMap, &slotted)
-
-	// Slot FirstName
-	firstPos := partMap["salutation"] + 1
-	if firstPos == len(n.SplitName) {
-		p.buildFullName()
-		return p
-	}
-	partMap["first"] = firstPos
-	FindFirst(&p, &n, partMap, &slotted)
-
-	// Slot prefixed LastName
-	FindLast(&p, &n, partMap, &slotted)
-
-	// Slot the rest
-	notSlotted := n.findNotSlotted(slotted)
-
-	// Identify a middle name
-	FindMiddle(&p, &n, partMap, &notSlotted)
-
-	if len(notSlotted) == 1 {
-		if partMap["lnprefix"] > -1 {
-			p.slot("middle", n.SplitName[notSlotted[0]])
+	// Break string in half along acronymn A.K.A, then find the longer of two names.
+	// When the acronmyn is absent, proceed to examine plain name.
+	str1, str2 := s.cut()
+	if str1 != EMPTY && str2 != EMPTY {
+		a := Parse(str1)
+		b := Parse(str2)
+		if a.Size > b.Size {
+			return a
 		} else {
-			p.slot("last", n.SplitName[notSlotted[0]])
+			return b
 		}
 	}
 
-	// Process aliases
-	for _, alias := range n.Aliases {
-		p.Aliases = append(p.Aliases, Parse(alias))
+	p := NameParts{ProvidedName: name}
+
+	size := s.Size
+	for range size {
+
+		// Read current word.
+		token, err := s.current()
+		if err != nil {
+			return p
+		}
+
+		// Is this token in the first half or second half of the whole string?
+		latter := s.latterHalf()
+		terminus := s.Final == s.Position
+
+		// Create two short-lived stacks for this token.
+		stackP := new(PuncStack).init()
+		stackL := new(LetterStack).init()
+
+		// Parse each character in word.
+		feedStacks(token, stackP, stackL)
+
+		// Are all letters capitalized?
+		allCaps := stackL.allCaps()
+
+		// What is the length of the word without punctuation?
+		tokenSize := stackL.size()
+
+		// Is this an Honorific? President
+		honorific := slices.Contains(salutations, strings.ToUpper(token))
+		if s.Position == 0 && honorific {
+			p.Salutation = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a Courtesy Title? Mr. Ms. Mrs. Dr.
+		if !latter && tokenSize >= 2 && stackP.period == 1 {
+			p.Salutation = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a first name?
+		if !latter && tokenSize >= 2 && stackP.period == 0 && p.FirstName == EMPTY {
+			cleanToken := stackL.assemble()
+			p.FirstName = cleanToken
+
+			s.next()
+			continue
+		}
+
+		// Is this a first initial? J.
+		if !latter && tokenSize == 1 && stackP.period == 1 && p.FirstName == EMPTY {
+			p.FirstName = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a second initial for a middle name? The D in J. D. Rockefeller
+		if tokenSize == 1 && stackP.period == 1 && p.FirstName != EMPTY && p.MiddleName == EMPTY {
+			p.MiddleName = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a middle name?
+		suffixes := false
+		if s.isNextTokenSuffix() == true || s.isNextTokenGenerational() == true {
+			suffixes = true
+		}
+		if latter && !terminus && p.FirstName != EMPTY && stackP.comma == 0 && stackP.apo == 0 && stackP.quomark == 0 && suffixes == false {
+
+			if p.MiddleName != EMPTY {
+				p.MiddleName += " " + token
+				s.next()
+				continue
+			}
+			p.MiddleName = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a simple nickname?
+		if latter && stackP.apo == 2 || latter && stackP.quomark == 2 {
+			cleanToken := stackL.assemble()
+			p.Nickname = cleanToken
+
+			s.next()
+			continue
+		}
+
+		// Is this a mistyped Irish name? O' Hurley needs to be O'Hurley
+		if latter && tokenSize == 1 && stackP.apo == 1 {
+			nextToken, err := s.peek()
+			if err != nil {
+				return p
+			}
+			tokens := []string{token, nextToken}
+			irishSurname := strings.Join(tokens, "")
+			p.LastName = irishSurname
+
+			s.next()
+			continue
+		}
+
+		// Is this a complex nickname?
+		if !terminus && stackP.apo == 1 || !terminus && stackP.quomark == 1 {
+
+			first := string(token[0])
+			last := string(token[tokenSize])
+			if first == QUO || first == APOSTROPHE {
+				p.Nickname = token
+
+				s.next()
+				continue
+			}
+
+			if last == QUO || last == APOSTROPHE {
+				p.Nickname += " " + token
+
+				s.next()
+				continue
+			}
+		}
+
+		// Is this a family name preceding a professional suffix? Polera, Esq.
+		if latter && !allCaps && stackP.period == 0 && suffixes {
+			cleanToken := stackL.assemble()
+			p.LastName = cleanToken
+
+			s.next()
+			continue
+		}
+
+		// Is this a family name? Rockefeller
+		if terminus && p.MiddleName != EMPTY && !allCaps && stackP.period == 0 && p.LastName == EMPTY || terminus && p.Nickname != EMPTY && !allCaps && p.LastName == EMPTY {
+
+			// Preserve hyphen in surname.
+			if stackP.hyphenated() {
+				p.LastName = token
+				s.next()
+				continue
+			}
+
+			cleanToken := stackL.assemble()
+
+			if len(p.MiddleName) > 0 && len(p.MiddleName) <= 3 {
+				cleanToken = p.MiddleName + " " + cleanToken
+				p.MiddleName = ""
+			}
+
+			p.LastName = cleanToken
+
+			s.next()
+			continue
+		}
+
+		// Is this a family name with a comma? Rockefeller,
+		if !terminus && latter && stackP.comma == 1 && p.LastName == EMPTY {
+			cleanToken := stackL.assemble()
+			p.LastName = cleanToken
+
+			s.next()
+			continue
+		}
+
+		// Is this an Irish surname? Preserve puncutation in token.
+		if terminus && stackP.apo == 1 && tokenSize > 2 && string(token[1]) == APOSTROPHE {
+			p.LastName = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a family name in a two token string?
+		if terminus && size == 2 {
+			cleanToken := stackL.assemble()
+			p.LastName = cleanToken
+
+			s.next()
+			continue
+		}
+
+		// Is this a generational suffix? II III IV VI
+		if latter && allCaps && tokenSize > 1 || latter && stackL.size() == 2 && stackP.period == 1 {
+			p.Generation = token
+
+			s.next()
+			continue
+		}
+
+		// Is this a professional suffix? Esq. M.D.
+		if terminus && stackP.period == 1 {
+			p.Suffix = token
+
+			s.next()
+			continue
+		}
+
+		// None of the rules applied. Advance to next token.
+		s.next()
 	}
 
-	// Prepare FullName
+	//// Prepare FullName
 	p.buildFullName()
 
 	return p
-}
-
-func SlotAndIndex(p *NameParts, n *nameString, parts *[]string, partMap map[string]int, slotted *[]int) {
-	for _, part := range *parts {
-		partIndex := n.find(part)
-		partMap[part] = partIndex
-		if partIndex > -1 {
-			p.slot(part, n.SplitName[partIndex])
-			*slotted = append(*slotted, partIndex)
-		}
-	}
-}
-
-func FindSalutation(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
-	if salIndex := n.find("salutation"); salIndex == 0 {
-		partMap["salutation"] = salIndex
-		p.slot("salutation", n.SplitName[salIndex])
-		*slotted = append(*slotted, salIndex)
-	} else {
-		partMap["salutation"] = -1
-	}
-}
-
-func FindNoName(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
-	if nnIndex := n.find("nonname"); nnIndex > -1 && nnIndex < len(n.SplitName)-1 {
-		partMap["nonname"] = nnIndex
-		p.slot("nonname", n.SplitName[nnIndex])
-		*slotted = append(*slotted, nnIndex)
-	} else {
-		partMap["nonname"] = -1
-	}
-}
-
-func FindFirst(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
-	p.slot("first", n.SplitName[partMap["first"]])
-	*slotted = append(*slotted, partMap["first"])
-}
-
-func FindLast(p *NameParts, n *nameString, partMap map[string]int, slotted *[]int) {
-	if partMap["lnprefix"] > -1 {
-		lnEnd := len(n.SplitName)
-		if partMap["generation"] > -1 {
-			lnEnd = partMap["generation"]
-		}
-		if partMap["suffix"] > -1 && partMap["generation"] < lnEnd {
-			lnEnd = partMap["suffix"]
-		}
-		// Need to validate the slice parameters make sense
-		// Example Name: "I am the Popsicle"
-		// This example causes a hit on the generation at position 0,
-		// which in turn causes lnEnd to be set to 0, but the lnprefix
-		// is greater than 0, causing a slice out of bounds panic
-		if lnEnd > partMap["lnprefix"] {
-			p.slot("last", strings.Join(n.SplitName[partMap["lnprefix"]:lnEnd], " "))
-		}
-
-		// Keep track of what we've slotted
-		for i := partMap["lnprefix"]; i <= lnEnd; i++ {
-			*slotted = append(*slotted, i)
-		}
-	}
-}
-
-func FindMiddle(p *NameParts, n *nameString, partMap map[string]int, notSlotted *[]int) {
-	if len(*notSlotted) > 1 {
-		lnPrefix := partMap["lnprefix"]
-		var multiMiddle []string
-		if lnPrefix > -1 {
-			for p := range *notSlotted {
-				multiMiddle = append(multiMiddle, n.SplitName[p])
-			}
-			p.slot("middle", strings.Join(multiMiddle, " "))
-
-		} else {
-			sort.Sort(sort.IntSlice(*notSlotted))
-			idx := len(*notSlotted) - 1
-			maxNotSlottedIndex := (*notSlotted)[idx]
-			p.slot("last", n.SplitName[maxNotSlottedIndex])
-
-			for _, p := range *notSlotted {
-				if p != maxNotSlottedIndex {
-					multiMiddle = append(multiMiddle, n.SplitName[p])
-				}
-			}
-			p.slot("middle", strings.Join(multiMiddle, " "))
-		}
-	}
 }
