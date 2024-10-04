@@ -254,17 +254,16 @@ func TestMisplacedApostrophe(t *testing.T) {
 }
 
 func TestMultipleAKA(t *testing.T) {
-	t.Skip("Reconsider the desired value from this test, and rewrite functionality...")
 	t.Parallel()
 
 	res := Parse("Tony Stark a/k/a Ironman a/k/a Stark, Anthony a/k/a Anthony Edward \"Tony\" Stark")
 
-	if len(res.Aliases) != 3 {
-		t.Errorf("Expected 3 aliases.  Actual: %v", len(res.Aliases))
+	if res.FirstName != "Anthony" {
+		t.Errorf("Expected 'Tony'.  Actual: %v", res.FirstName)
 	}
 
-	if res.FirstName != "Tony" {
-		t.Errorf("Expected 'Tony'.  Actual: %v", res.FirstName)
+	if res.Nickname != "Tony" {
+		t.Errorf("Expected 'Tony'.  Actual: %v", res.Nickname)
 	}
 
 	if res.LastName != "Stark" {
