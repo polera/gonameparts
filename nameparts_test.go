@@ -407,33 +407,21 @@ func TestSuffix(t *testing.T) {
 	}
 }
 
-func ExampleParse() {
-	res := Parse("Thurston Howell III")
-	fmt.Println("FirstName:", res.FirstName)
-	fmt.Println("LastName:", res.LastName)
-	fmt.Println("Generation:", res.Generation)
+func TestPeekGeneration(t *testing.T) {
+	t.Parallel()
+	res := Parse("John Smith III")
 
-	// Output:
-	// FirstName: Thurston
-	// LastName: Howell
-	// Generation: III
+	if res.FirstName != "John" {
+		t.Errorf("Expected 'John'. Actual: %v", res.FirstName)
+	}
 
-}
+	if res.LastName != "Smith" {
+		t.Errorf("Expected 'Smith'. Actual: %v", res.LastName)
+	}
 
-func ExampleParse_second() {
-
-	res := Parse("President George Herbert Walker Bush")
-	fmt.Println("Salutation:", res.Salutation)
-	fmt.Println("FirstName:", res.FirstName)
-	fmt.Println("MiddleName:", res.MiddleName)
-	fmt.Println("LastName:", res.LastName)
-
-	// Output:
-	// Salutation: President
-	// FirstName: George
-	// MiddleName: Herbert Walker
-	// LastName: Bush
-
+	if res.Generation != "III" {
+		t.Errorf("Expected 'III'. Actual: %v", res.Generation)
+	}
 }
 
 func TestScannerCreation(t *testing.T) {

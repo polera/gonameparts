@@ -139,3 +139,19 @@ func (s *Scanner) isNextTokenSuffix() bool {
 
 	return false
 }
+
+func (s *Scanner) isNextTokenGenerational() bool {
+	token, err := s.peek()
+	if err != nil {
+		return false
+	}
+
+	// Create two short-lived stacks for this token.
+	stackP := new(PuncStack).init()
+	stackL := new(LetterStack).init()
+
+	// Parse each character in word.
+	feedStacks(token, stackP, stackL)
+
+	return stackL.allCaps()
+}
