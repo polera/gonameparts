@@ -1,7 +1,7 @@
 # gonameparts
 gonameparts splits a human name into individual parts. This is useful when dealing with external data sources that provide names as a single value, but you need to store the discrete parts in a database for example.
 
-[![GoDoc](https://godoc.org/github.com/polera/gonameparts?status.svg)](https://godoc.org/github.com/polera/gonameparts)  
+[![GoDoc](https://godoc.org/github.com/polera/gonameparts?status.svg)](https://godoc.org/github.com/polera/gonameparts)
 
 Author
 ==
@@ -36,57 +36,19 @@ func main() {
 	// LastName: Howell
 	// Generation: III
 
-    // Parse a name with multiple "also known as" aliases, output JSON
+    // Parse a name with multiple "also known as" aliases, preserve longest name, output JSON
 	multipleAKA := gonameparts.Parse("Tony Stark a/k/a Ironman a/k/a Stark, Anthony a/k/a Anthony Edward \"Tony\" Stark")
 	jsonParts, _ := json.Marshal(multipleAKA)
 	fmt.Printf("%v\n", string(jsonParts))
 	/* Output:
 		{
-	    "aliases": [
-	        {
-	            "aliases": null,
-	            "first_name": "Ironman",
-	            "full_name": "Ironman",
-	            "generation": "",
-	            "last_name": "",
-	            "middle_name": "",
-	            "nickname": "",
-	            "provided_name": " Ironman ",
-	            "salutation": "",
-	            "suffix": ""
-	        },
-	        {
-	            "aliases": null,
-	            "first_name": "Anthony",
-	            "full_name": "Anthony Stark",
-	            "generation": "",
-	            "last_name": "Stark",
-	            "middle_name": "",
-	            "nickname": "",
-	            "provided_name": " Stark, Anthony ",
-	            "salutation": "",
-	            "suffix": ""
-	        },
-	        {
-	            "aliases": null,
-	            "first_name": "Anthony",
-	            "full_name": "Anthony Edward Stark",
-	            "generation": "",
-	            "last_name": "Stark",
-	            "middle_name": "Edward",
-	            "nickname": "\"Tony\"",
-	            "provided_name": " Anthony Edward \"Tony\" Stark",
-	            "salutation": "",
-	            "suffix": ""
-	        }
-	    ],
-	    "first_name": "Tony",
-	    "full_name": "Tony Stark",
+	    "first_name": "Anthony",
+	    "full_name": "",
 	    "generation": "",
 	    "last_name": "Stark",
-	    "middle_name": "",
-	    "nickname": "",
-	    "provided_name": "Tony Stark a/k/a Ironman a/k/a Stark, Anthony a/k/a Anthony Edward \"Tony\" Stark",
+	    "middle_name": "Edward",
+	    "nickname": "Tony",
+	    "provided_name": "Anthony Edward \"Tony\" Stark",
 	    "salutation": "",
 	    "suffix": ""
 		}*/
